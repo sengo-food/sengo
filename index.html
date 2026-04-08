@@ -3,132 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>sengo森林食品 商品相册</title>
+<title>sengo 森林食品</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui, -apple-system, sans-serif}
-body{background:#f8f9fa;padding:16px;min-height:100vh}
-.title{text-align:center;padding:20px 0;font-size:22px;font-weight:700;color:#2E7D32;letter-spacing:1px}
-.tabs{display:flex;gap:10px;overflow:auto;padding:10px 0;white-space:nowrap;margin-bottom:16px;scrollbar-width:none}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{background:#F7F8FA;color:#111;padding-bottom:40px}
+
+/* 顶部品牌栏 */
+.header{background:#fff;padding:18px 16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+.brand{font-size:20px;font-weight:800;color:#222;letter-spacing:1px}
+.slogan{font-size:12px;color:#888;margin-top:4px}
+
+/* 分类横向滚动 */
+.tabs{padding:14px 12px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;background:#fff;margin-bottom:12px}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:10px 20px;background:#fff;border-radius:24px;font-size:15px;cursor:pointer;border:1px solid #e8e8e8;transition:all 0.3s ease}
-.tab.active{background:#2E7D32;color:#fff;border:none;box-shadow:0 2px 8px rgba(46, 125, 50, 0.3)}
-.list{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:16px;padding:0 4px}
-.item{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.06);transition:transform 0.2s ease, box-shadow 0.2s ease;position:relative}
-.item:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.1)}
-.item img{width:100%;height:280px;object-fit:cover;background:#f5f5f5}
-.info{padding:16px}
-.name{font-weight:700;font-size:17px;margin-bottom:6px;color:#1a1a1a}
-.spec{color:#666;font-size:14px;margin-bottom:8px}
-.price{color:#E53935;font-weight:700;font-size:18px}
-/* 标签样式 */
-.tag{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600;color:#fff;z-index:10}
-.tag.new{background:#ff4757}
-.tag.discount{background:#ffa502}
-.empty{text-align:center;padding:80px 20px;color:#999;font-size:15px}
+.tab{white-space:nowrap;padding:10px 18px;border-radius:20px;background:#F1F3F5;font-size:14px;font-weight:500;color:#444;cursor:pointer}
+.tab.active{background:#222;color:#fff}
+
+/* 商品网格 */
+.goods-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 12px}
+
+/* 高级商品卡片 */
+.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.04)}
+.card-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#f2f2f2}
+.card-info{padding:12px}
+.card-name{font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.card-spec{font-size:11px;color:#999;margin-bottom:8px}
+.price-row{display:flex;align-items:center;gap:6px}
+.price{font-size:16px;font-weight:800;color:#D32F2F}
+.old-price{font-size:11px;color:#bbb;text-decoration:line-block}
+
+/* 标签：新品 / 热销 / 折扣 */
+.tag{position:absolute;background:#D32F2F;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}
+.tag.new{background:#000}
+.tag.hot{background:#D32F2F}
+.tag.discount{background:#FF6F00}
+
+/* 卡片容器相对定位 */
+.card{position:relative}
 </style>
 </head>
 
 <body>
-<div class="title">sengo 森林食品 特产电子相册</div>
+
+<div class="header">
+  <div class="brand">sengo 森林食品</div>
+  <div class="slogan">深山好货 · 天然健康 · 原产地直供</div>
+</div>
+
 <div class="tabs" id="tabs"></div>
-<div class="list" id="list"></div>
+<div class="goods-grid" id="list"></div>
 
 <script>
-// ✅ 商品数据池：在这里直接配置所有商品，包括新品/折扣标签
-const goodsList = [
+// 商品数据（你以后加新品就在这里复制粘贴）
+const goods = [
   {
     cate: "坚果",
-    name: "榛子",
+    name: "野生榛子",
     spec: "500g/袋",
     price: "39.9",
+    oldPrice: "59.0",
     img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png",
-    tags: ["new"] // 新品标签
+    tag: "new"
   },
   {
     cate: "菌菇",
-    name: "黑木耳",
+    name: "东北黑木耳",
     spec: "250g/袋",
     price: "29.9",
+    oldPrice: "45.0",
     img: "https://s41.ax1x.com/2026/04/08/peUIvGj.png",
-    tags: ["discount"] // 折扣标签
+    tag: "hot"
   },
   {
     cate: "饮品",
-    name: "蓝莓汁",
-    spec: "250g/袋",
+    name: "野生蓝莓汁",
+    spec: "250ml/瓶",
     price: "29.9",
+    oldPrice: "39.9",
     img: "https://s41.ax1x.com/2026/04/08/peUoCLV.png",
-    tags: ["new", "discount"] // 同时加两个标签
+    tag: "discount"
   },
   {
     cate: "果酒",
-    name: "蓝莓酒",
-    spec: "250g/袋",
-    price: "29.9",
+    name: "蓝莓果酒",
+    spec: "低度微醺",
+    price: "49.0",
+    oldPrice: "69.0",
     img: "https://s41.ax1x.com/2026/04/08/peUoiZT.png",
-    tags: [] // 无标签
+    tag: ""
   },
   {
     cate: "滋补",
-    name: "鹿茸",
-    spec: "250g/袋",
-    price: "29.9",
+    name: "鹿茸片",
+    spec: "精选好货",
+    price: "128.0",
+    oldPrice: "198.0",
     img: "https://s41.ax1x.com/2026/04/08/peUoFdU.png",
-    tags: ["new"]
+    tag: "new"
   }
-];
+]
+
+// 渲染分类
+const cateList = [...new Set(goods.map(i=>i.cate))]
+const tabsEl = document.getElementById('tabs')
+tabsEl.innerHTML = cateList.map((c,i)=>`
+  <div class="tab ${i==0?'active':''}" data-cate="${c}">${c}</div>
+`).join('')
 
 // 渲染商品
-function renderGoods() {
-  // 生成分类标签
-  const categories = [...new Set(goodsList.map(item => item.cate))];
-  const tabsContainer = document.getElementById('tabs');
-  tabsContainer.innerHTML = categories.map(cate => 
-    `<div class="tab ${cate === categories[0] ? 'active' : ''}" data-cate="${cate}">${cate}</div>`
-  ).join('');
-
-  // 默认显示第一个分类
-  showGoods(categories[0]);
-
-  // 分类切换事件
-  tabsContainer.addEventListener('click', (e) => {
-    if (e.target.dataset.cate) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      e.target.classList.add('active');
-      showGoods(e.target.dataset.cate);
-    }
-  });
-}
-
-// 显示对应分类商品
-function showGoods(cate) {
-  const listContainer = document.getElementById('list');
-  const filteredGoods = goodsList.filter(item => item.cate === cate);
-  
-  listContainer.innerHTML = filteredGoods.length ? filteredGoods.map(item => {
-    // 生成标签HTML
-    const tagHtml = item.tags.map(tag => {
-      if(tag === 'new') return `<span class="tag new">新品</span>`;
-      if(tag === 'discount') return `<span class="tag discount">折扣</span>`;
-      return '';
-    }).join('');
-
-    return `
-      <div class="item">
-        ${tagHtml}
-        <img src="${item.img}" alt="${item.name}">
-        <div class="info">
-          <div class="name">${item.name}</div>
-          <div class="spec">${item.spec}</div>
-          <div class="price">¥${item.price}</div>
+function showList(cate){
+  const list = goods.filter(g=>g.cate==cate)
+  document.getElementById('list').innerHTML = list.map(g=>`
+    <div class="card">
+      ${g.tag?`<div class="tag ${g.tag}">${g.tag=='new'?'新品':g.tag=='hot'?'热销':'折扣'}</div>`:''}
+      <img class="card-img" src="${g.img}" />
+      <div class="card-info">
+        <div class="card-name">${g.name}</div>
+        <div class="card-spec">${g.spec}</div>
+        <div class="price-row">
+          <div class="price">¥${g.price}</div>
+          <div class="old-price">¥${g.oldPrice}</div>
         </div>
       </div>
-    `;
-  }).join('') : '<div class="empty">该分类暂无商品</div>';
+    </div>
+  `).join('')
 }
 
-// 页面加载完成后执行
-window.onload = renderGoods;
+// 切换分类
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'))
+    t.classList.add('active')
+    showList(t.dataset.cate)
+  }
+})
+
+// 初始显示第一个分类
+showList(cateList[0])
 </script>
+
 </body>
 </html>
