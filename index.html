@@ -19,83 +19,78 @@ body{background:#f7f7f7;padding:12px}
 .spec{color:#666;font-size:13px;margin-bottom:6px}
 .price{color:#E53935;font-weight:bold;font-size:16px}
 .empty{text-align:center;padding:60px 20px;color:#999;font-size:14px}
-.loading{text-align:center;padding:60px 20px;color:#666}
 </style>
 </head>
 
 <body>
 <div class="title">sengo 森林食品 特产电子相册</div>
 <div class="tabs" id="tabs"></div>
-<div class="list" id="list"><div class="loading">正在加载商品数据...</div></div>
+<div class="list" id="list"></div>
 
 <script>
-// ✅ 固定填你的腾讯文档链接，不用改
-const SHEET_URL = "https://docs.qq.com/openapi/doc/export/DZW9zdkFXdEVPQkxD?format=csv&t=csv";
-
-async function loadGoods() {
-  try {
-    const res = await fetch(SHEET_URL);
-    const text = await res.text();
-    const rows = text.match(/\[(.*?)\]/g) || [];
-    const goodsList = [];
-
-    // 跳过表头，从第2行开始读取
-    rows.slice(1).forEach(row => {
-      try {
-        const data = JSON.parse(row.replace(/'/g, '"'));
-        const [cate, name, spec, price, img] = data;
-        if (name && price) {
-          // 自动处理图片链接，兼容页面链接/直链
-          let imgUrl = img || "https://picsum.photos/300/150?random=" + Math.random();
-          if (imgUrl.includes("imgchr.com/i/")) {
-            const imgId = imgUrl.split("/i/")[1];
-            imgUrl = `https://s41.ax1x.com/2026/04/08/${imgId}.png`;
-          }
-          goodsList.push({
-            cate: cate || "未分类",
-            name,
-            spec: spec || "无规格",
-            price,
-            img: imgUrl
-          });
-        }
-      } catch (e) {
-        console.error("行数据解析失败:", e);
-      }
-    });
-
-    if (goodsList.length === 0) {
-      document.getElementById('list').innerHTML = '<div class="empty">请先在腾讯文档中添加商品数据</div>';
-      return;
-    }
-
-    // 生成分类标签
-    const categories = [...new Set(goodsList.map(item => item.cate))];
-    const tabsContainer = document.getElementById('tabs');
-    tabsContainer.innerHTML = categories.map(cate => 
-      `<div class="tab ${cate === categories[0] ? 'active' : ''}" data-cate="${cate}">${cate}</div>`
-    ).join('');
-
-    // 默认显示第一个分类
-    renderGoods(categories[0], goodsList);
-
-    // 分类切换事件
-    tabsContainer.addEventListener('click', (e) => {
-      if (e.target.dataset.cate) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        e.target.classList.add('active');
-        renderGoods(e.target.dataset.cate, goodsList);
-      }
-    });
-
-  } catch (err) {
-    document.getElementById('list').innerHTML = '<div class="empty">数据加载失败，请检查腾讯文档权限</div>';
-    console.error("加载失败:", err);
+// ✅ 直接在这里写商品数据，完全不用腾讯文档，100%不报错
+const goodsList = [
+  {
+    cate: "坚果",
+    name: "榛子",
+    spec: "500g/袋",
+    price: "39.9",
+    img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png"
+  },
+  {
+    cate: "菌菇",
+    name: "黑木耳",
+    spec: "250g/袋",
+    price: "29.9",
+    img: "https://s41.ax1x.com/2026/04/08/peUIvGj.png"
+  },
+  {
+    cate: "饮品",
+    name: "蓝莓汁",
+    spec: "250g/袋",
+    price: "29.9",
+    img: "https://s41.ax1x.com/2026/04/08/peUoCLV.png"
+  },
+  {
+    cate: "果酒",
+    name: "蓝莓酒",
+    spec: "250g/袋",
+    price: "29.9",
+    img: "https://s41.ax1x.com/2026/04/08/peUoiZT.png"
+  },
+  {
+    cate: "滋补",
+    name: "鹿茸",
+    spec: "250g/袋",
+    price: "29.9",
+    img: "https://s41.ax1x.com/2026/04/08/peUoFdU.png"
   }
+];
+
+// 渲染商品
+function renderGoods() {
+  // 生成分类标签
+  const categories = [...new Set(goodsList.map(item => item.cate))];
+  const tabsContainer = document.getElementById('tabs');
+  tabsContainer.innerHTML = categories.map(cate => 
+    `<div class="tab ${cate === categories[0] ? 'active' : ''}" data-cate="${cate}">${cate}</div>`
+  ).join('');
+
+  // 默认显示第一个分类
+  showGoods(categories[0]);
+
+  // 分类切换事件
+  tabsContainer.addEventListener('click', (e) => {
+    if (e.target.dataset.cate) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      showGoods(e.target.dataset.cate);
+    }
+  });
 }
 
-// 渲染商品列表
-function renderGoods(cate, goodsList) {
+// 显示对应分类商品
+function showGoods(cate) {
   const listContainer = document.getElementById('list');
   const filteredGoods = goodsList.filter(item => item.cate === cate);
   
@@ -112,7 +107,7 @@ function renderGoods(cate, goodsList) {
 }
 
 // 页面加载完成后执行
-window.onload = loadGoods;
+window.onload = renderGoods;
 </script>
 </body>
 </html>
