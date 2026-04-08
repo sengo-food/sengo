@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>sengo 森林食品</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{background:#F7F8FA;color:#111;padding-bottom:40px}
+
+/* 顶部品牌栏（品牌绿色） */
+.header{background:#2D7D45;padding:18px 16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+.brand{font-size:20px;font-weight:800;color:#fff;letter-spacing:1px}
+.slogan{font-size:12px;color:#ffffff;margin-top:4px;opacity:0.9}
+
+/* 分类横向滚动 */
+.tabs{padding:14px 12px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;background:#fff;margin-bottom:12px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;padding:10px 18px;border-radius:20px;background:#F1F3F5;font-size:14px;font-weight:500;color:#444;cursor:pointer}
+.tab.active{background:#2D7D45;color:#fff}
+
+/* 商品网格 */
+.goods-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 12px}
+
+/* 高级商品卡片 */
+.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.04)}
+.card-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#f2f2f2}
+.card-info{padding:12px}
+.card-name{font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.card-spec{font-size:11px;color:#999;margin-bottom:8px}
+.price-row{display:flex;align-items:center;gap:6px}
+.price{font-size:16px;font-weight:800;color:#D32F2F}
+.old-price{font-size:11px;color:#999;text-decoration:line-through}
+
+/* 标签：新品 / 热销 / 折扣 */
+.tag{position:absolute;background:#D32F2F;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}
+.tag.new{background:#2D7D45}
+.tag.hot{background:#D32F2F}
+.tag.discount{background:#FF6F00}
+
+/* 卡片容器相对定位 */
+.card{position:relative}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="brand">sengo 森林食品</div>
+  <div class="slogan">北纬47°兴安岭原始森林 · 伊春产地直供</div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div class="goods-grid" id="list"></div>
+
+<script>
+// 商品数据
+const goods = [
+  {
+    cate: "坚果",
+    name: "野生榛子",
+    spec: "500g/袋",
+    price: "39.9",
+    oldPrice: "59.0",
+    img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png",
+    tag: "new"
+  },
+  {
+    cate: "菌菇",
+    name: "东北黑木耳",
+    spec: "250g/袋",
+    price: "29.9",
+    oldPrice: "45.0",
+    img: "https://s41.ax1x.com/2026/04/08/peUIvGj.png",
+    tag: "hot"
+  },
+  {
+    cate: "饮品",
+    name: "野生蓝莓汁",
+    spec: "250ml/瓶",
+    price: "29.9",
+    oldPrice: "39.9",
+    img: "https://s41.ax1x.com/2026/04/08/peUoCLV.png",
+    tag: "discount"
+  },
+  {
+    cate: "果酒",
+    name: "蓝莓果酒",
+    spec: "低度微醺",
+    price: "49.0",
+    oldPrice: "69.0",
+    img: "https://s41.ax1x.com/2026/04/08/peUoiZT.png",
+    tag: ""
+  },
+  {
+    cate: "滋补",
+    name: "鹿茸片",
+    spec: "精选好货",
+    price: "128.0",
+    oldPrice: "198.0",
+    img: "https://s41.ax1x.com/2026/04/08/peUoFdU.png",
+    tag: "new"
+  }
+]
+
+// 渲染分类
+const cateList = [...new Set(goods.map(i=>i.cate))]
+const tabsEl = document.getElementById('tabs')
+tabsEl.innerHTML = cateList.map((c,i)=>`
+  <div class="tab ${i==0?'active':''}" data-cate="${c}">${c}</div>
+`).join('')
+
+// 渲染商品
+function showList(cate){
+  const list = goods.filter(g=>g.cate==cate)
+  document.getElementById('list').innerHTML = list.map(g=>`
+    <div class="card">
+      ${g.tag?`<div class="tag ${g.tag}">${g.tag=='new'?'新品':g.tag=='hot'?'热销':'折扣'}</div>`:''}
+      <img class="card-img" src="${g.img}" />
+      <div class="card-info">
+        <div class="card-name">${g.name}</div>
+        <div class="card-spec">${g.spec}</div>
+        <div class="price-row">
+          <div class="price">¥${g.price}</div>
+          <div class="old-price">¥${g.oldPrice}</div>
+        </div>
+      </div>
+    </div>
+  `).join('')
+}
+
+// 切换分类
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'))
+    t.classList.add('active')
+    showList(t.dataset.cate)
+  }
+})
+
+// 初始显示第一个分类
+showList(cateList[0])
+</script>
+
+</body>
+</html>
