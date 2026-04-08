@@ -5,20 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>sengo森林食品 商品相册</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}
-body{background:#f7f7f7;padding:12px}
-.title{text-align:center;padding:15px 0;font-size:20px;font-weight:600;color:#2E7D32}
-.tabs{display:flex;gap:8px;overflow:auto;padding:10px 0;white-space:nowrap;margin-bottom:10px}
-.tab{padding:8px 16px;background:#fff;border-radius:20px;font-size:14px;cursor:pointer;border:1px solid #eee}
-.tab.active{background:#2E7D32;color:#fff;border:none}
-.list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.item{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-.item img{width:100%;height:150px;object-fit:cover}
-.info{padding:12px}
-.name{font-weight:bold;font-size:15px;margin-bottom:4px}
-.spec{color:#666;font-size:13px;margin-bottom:6px}
-.price{color:#E53935;font-weight:bold;font-size:16px}
-.empty{text-align:center;padding:60px 20px;color:#999;font-size:14px}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui, -apple-system, sans-serif}
+body{background:#f8f9fa;padding:16px;min-height:100vh}
+.title{text-align:center;padding:20px 0;font-size:22px;font-weight:700;color:#2E7D32;letter-spacing:1px}
+.tabs{display:flex;gap:10px;overflow:auto;padding:10px 0;white-space:nowrap;margin-bottom:16px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 20px;background:#fff;border-radius:24px;font-size:15px;cursor:pointer;border:1px solid #e8e8e8;transition:all 0.3s ease}
+.tab.active{background:#2E7D32;color:#fff;border:none;box-shadow:0 2px 8px rgba(46, 125, 50, 0.3)}
+.list{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:16px;padding:0 4px}
+.item{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.06);transition:transform 0.2s ease, box-shadow 0.2s ease;position:relative}
+.item:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.1)}
+.item img{width:100%;height:280px;object-fit:cover;background:#f5f5f5}
+.info{padding:16px}
+.name{font-weight:700;font-size:17px;margin-bottom:6px;color:#1a1a1a}
+.spec{color:#666;font-size:14px;margin-bottom:8px}
+.price{color:#E53935;font-weight:700;font-size:18px}
+/* 标签样式 */
+.tag{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600;color:#fff;z-index:10}
+.tag.new{background:#ff4757}
+.tag.discount{background:#ffa502}
+.empty{text-align:center;padding:80px 20px;color:#999;font-size:15px}
 </style>
 </head>
 
@@ -28,42 +34,47 @@ body{background:#f7f7f7;padding:12px}
 <div class="list" id="list"></div>
 
 <script>
-// ✅ 直接在这里写商品数据，完全不用腾讯文档，100%不报错
+// ✅ 商品数据池：在这里直接配置所有商品，包括新品/折扣标签
 const goodsList = [
   {
     cate: "坚果",
     name: "榛子",
     spec: "500g/袋",
     price: "39.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png"
+    img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png",
+    tags: ["new"] // 新品标签
   },
   {
     cate: "菌菇",
     name: "黑木耳",
     spec: "250g/袋",
     price: "29.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUIvGj.png"
+    img: "https://s41.ax1x.com/2026/04/08/peUIvGj.png",
+    tags: ["discount"] // 折扣标签
   },
   {
     cate: "饮品",
     name: "蓝莓汁",
     spec: "250g/袋",
     price: "29.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUoCLV.png"
+    img: "https://s41.ax1x.com/2026/04/08/peUoCLV.png",
+    tags: ["new", "discount"] // 同时加两个标签
   },
   {
     cate: "果酒",
     name: "蓝莓酒",
     spec: "250g/袋",
     price: "29.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUoiZT.png"
+    img: "https://s41.ax1x.com/2026/04/08/peUoiZT.png",
+    tags: [] // 无标签
   },
   {
     cate: "滋补",
     name: "鹿茸",
     spec: "250g/袋",
     price: "29.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUoFdU.png"
+    img: "https://s41.ax1x.com/2026/04/08/peUoFdU.png",
+    tags: ["new"]
   }
 ];
 
@@ -94,16 +105,26 @@ function showGoods(cate) {
   const listContainer = document.getElementById('list');
   const filteredGoods = goodsList.filter(item => item.cate === cate);
   
-  listContainer.innerHTML = filteredGoods.length ? filteredGoods.map(item => `
-    <div class="item">
-      <img src="${item.img}" alt="${item.name}">
-      <div class="info">
-        <div class="name">${item.name}</div>
-        <div class="spec">${item.spec}</div>
-        <div class="price">¥${item.price}</div>
+  listContainer.innerHTML = filteredGoods.length ? filteredGoods.map(item => {
+    // 生成标签HTML
+    const tagHtml = item.tags.map(tag => {
+      if(tag === 'new') return `<span class="tag new">新品</span>`;
+      if(tag === 'discount') return `<span class="tag discount">折扣</span>`;
+      return '';
+    }).join('');
+
+    return `
+      <div class="item">
+        ${tagHtml}
+        <img src="${item.img}" alt="${item.name}">
+        <div class="info">
+          <div class="name">${item.name}</div>
+          <div class="spec">${item.spec}</div>
+          <div class="price">¥${item.price}</div>
+        </div>
       </div>
-    </div>
-  `).join('') : '<div class="empty">该分类暂无商品</div>';
+    `;
+  }).join('') : '<div class="empty">该分类暂无商品</div>';
 }
 
 // 页面加载完成后执行
