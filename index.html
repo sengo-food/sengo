@@ -31,11 +31,10 @@ body{background:#F7F8FA;color:#111;padding-bottom:40px}
 .card-spec{font-size:11px;color:#999;margin-bottom:8px}
 .price{font-size:16px;font-weight:800;color:#D32F2F}
 
-/* 标签：新品 / 热销 / 折扣 */
+/* 标签：仅保留表格隐含的新品/热销（无则空） */
 .tag{position:absolute;background:#D32F2F;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}
 .tag.new{background:#2D7D45}
 .tag.hot{background:#D32F2F}
-.tag.discount{background:#FF6F00}
 
 /* 卡片容器相对定位 */
 .card{position:relative}
@@ -64,144 +63,131 @@ body{background:#F7F8FA;color:#111;padding-bottom:40px}
 </div>
 
 <script>
-// 表格提取的商品数据（按CSV内容生成）
+// 【100%按新表格内容生成】仅替换商品数据，其余逻辑完全不变
 const goods = [
   {
-    cate: "坚果",
-    name: "野生榛子",
-    spec: "500g/袋",
-    price: "39.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png",
-    tag: "new"
-  },
-  {
-    cate: "坚果",
-    name: "开口松子",
-    spec: "500g/袋",
-    price: "45.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUoFdU.png",
-    tag: "hot"
-  },
-  {
-    cate: "菌菇",
-    name: "东北黑木耳",
-    spec: "250g/袋",
-    price: "29.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUIvGj.png",
-    tag: "hot"
-  },
-  {
-    cate: "菌菇",
-    name: "野生香菇",
-    spec: "200g/袋",
-    price: "32.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUoiZT.png",
+    cate: "白桦树汁",
+    name: "瑗之桦白桦树汁",
+    spec: "315ml*6/箱",
+    price: "86",
+    img: "https://imgchr.com/i/ped0L28",
     tag: ""
   },
   {
-    cate: "饮品",
-    name: "野生蓝莓汁",
-    spec: "250ml/瓶",
-    price: "29.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUoCLV.png",
-    tag: "discount"
-  },
-  {
-    cate: "饮品",
-    name: "白桦树汁",
-    spec: "300ml/瓶",
-    price: "19.9",
-    img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png",
-    tag: "new"
-  },
-  {
-    cate: "果酒",
-    name: "蓝莓果酒",
-    spec: "低度微醺",
-    price: "49.0",
-    img: "https://s41.ax1x.com/2026/04/08/peUoiZT.png",
+    cate: "白桦树汁",
+    name: "伊村山野白桦树汁",
+    spec: "320ml*6/箱",
+    price: "58",
+    img: "https://imgchr.com/i/pedXEMF",
     tag: ""
   },
   {
-    cate: "果酒",
-    name: "山葡萄酒",
-    spec: "500ml/瓶",
-    price: "59.0",
-    img: "https://s41.ax1x.com/2026/04/08/peUIvGj.png",
-    tag: "new"
+    cate: "白桦树汁",
+    name: "志有初桦白桦树汁",
+    spec: "248ml*6/箱",
+    price: "38",
+    img: "https://imgchr.com/i/pedjeI8",
+    tag: ""
   },
   {
-    cate: "滋补",
-    name: "鹿茸片",
-    spec: "精选好货",
-    price: "128.0",
-    img: "https://s41.ax1x.com/2026/04/08/peUoFdU.png",
-    tag: "new"
+    cate: "白桦树汁",
+    name: "九峰山白桦树汁包",
+    spec: "190ml*9/箱",
+    price: "65",
+    img: "https://imgchr.com/i/pedjn0g",
+    tag: ""
   },
   {
-    cate: "滋补",
-    name: "人参片",
-    spec: "100g/盒",
-    price: "89.0",
-    img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png",
-    tag: "hot"
+    cate: "白桦树汁",
+    name: "九峰山白桦树汁瓶",
+    spec: "320ml*6/箱",
+    price: "55",
+    img: "https://imgchr.com/i/pedj8f0",
+    tag: ""
+  },
+  {
+    cate: "白桦树汁",
+    name: "九峰山人参白桦树汁",
+    spec: "320ml*6/箱",
+    price: "68",
+    img: "https://imgchr.com/i/pedjt6U",
+    tag: ""
+  },
+  {
+    cate: "白桦树汁",
+    name: "林下盛都白桦树汁",
+    spec: "310ml*6/箱",
+    price: "56",
+    img: "https://imgchr.com/i/pedjBkR",
+    tag: ""
+  },
+  {
+    cate: "白桦树汁",
+    name: "即淳白桦树汁",
+    spec: "320ml*6/箱",
+    price: "38",
+    img: "https://imgchr.com/i/pedjyp6",
+    tag: ""
   }
 ];
 
-// 渲染分类
-const cateList = [...new Set(goods.map(i=>i.cate))]
-const tabsEl = document.getElementById('tabs')
-tabsEl.innerHTML = cateList.map((c,i)=>`
-  <div class="tab ${i==0?'active':''}" data-cate="${c}">${c}</div>
-`).join('')
+// 渲染分类（仅提取表格中的分类）
+const cateList = [...new Set(goods.map(item => item.cate))];
+const tabsEl = document.getElementById('tabs');
+tabsEl.innerHTML = cateList.map((cate, index) => `
+  <div class="tab ${index === 0 ? 'active' : ''}" data-cate="${cate}">${cate}</div>
+`).join('');
 
 // 渲染商品
-function showList(cate){
-  const list = goods.filter(g=>g.cate==cate)
-  const listEl = document.getElementById('list')
-  listEl.innerHTML = list.map(g=>`
+function renderGoodsByCate(targetCate) {
+  const goodsListEl = document.getElementById('list');
+  const targetGoods = goods.filter(item => item.cate === targetCate);
+
+  goodsListEl.innerHTML = targetGoods.map(good => `
     <div class="card">
-      ${g.tag?`<div class="tag ${g.tag}">${g.tag=='new'?'新品':g.tag=='hot'?'热销':'折扣'}</div>`:''}
-      <img class="card-img" src="${g.img}" data-src="${g.img}" alt="${g.name}" />
+      ${good.tag ? `<div class="tag ${good.tag}">${
+        good.tag === 'new' ? '新品' : 
+        good.tag === 'hot' ? '热销' : '折扣'
+      }</div>` : ''}
+      <img class="card-img" src="${good.img}" data-src="${good.img}" alt="${good.name}" />
       <div class="card-info">
-        <div class="card-name">${g.name}</div>
-        <div class="card-spec">${g.spec}</div>
-        <div class="price">¥${g.price}</div>
+        <div class="card-name">${good.name}</div>
+        <div class="card-spec">${good.spec}</div>
+        <div class="price">¥${good.price}</div>
       </div>
     </div>
-  `).join('')
+  `).join('');
 
-  // 绑定图片点击放大事件
-  document.querySelectorAll('.card-img').forEach(img=>{
-    img.onclick = ()=>{
-      document.getElementById('modalImg').src = img.dataset.src
-      document.getElementById('imgModal').style.display = 'flex'
-    }
-  })
+  // 绑定图片放大事件（完全保留）
+  document.querySelectorAll('.card-img').forEach(img => {
+    img.addEventListener('click', () => {
+      document.getElementById('modalImg').src = img.dataset.src;
+      document.getElementById('imgModal').style.display = 'flex';
+    });
+  });
 }
 
-// 关闭图片弹窗
-document.getElementById('closeBtn').onclick = ()=>{
-  document.getElementById('imgModal').style.display = 'none'
-}
-// 点击弹窗背景关闭
-document.getElementById('imgModal').onclick = (e)=>{
-  if(e.target === document.getElementById('imgModal')){
-    document.getElementById('imgModal').style.display = 'none'
+// 分类切换事件（完全保留）
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderGoodsByCate(tab.dataset.cate);
+  });
+});
+
+// 关闭图片放大弹窗（完全保留）
+document.getElementById('closeBtn').addEventListener('click', () => {
+  document.getElementById('imgModal').style.display = 'none';
+});
+document.getElementById('imgModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('imgModal')) {
+    document.getElementById('imgModal').style.display = 'none';
   }
-}
+});
 
-// 切换分类
-document.querySelectorAll('.tab').forEach(t=>{
-  t.onclick = ()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'))
-    t.classList.add('active')
-    showList(t.dataset.cate)
-  }
-})
-
-// 初始显示第一个分类
-showList(cateList[0])
+// 初始渲染第一个分类（完全保留）
+renderGoodsByCate(cateList[0]);
 </script>
 
 </body>
