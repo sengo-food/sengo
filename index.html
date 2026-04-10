@@ -24,13 +24,12 @@ body{background:#F7F8FA;color:#111;padding-bottom:40px}
 
 /* 高级商品卡片 */
 .card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.04)}
-.card-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#f2f2f2}
+.card-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#f2f2f2;cursor:pointer;transition:transform 0.2s ease}
+.card-img:hover{transform:scale(1.02)}
 .card-info{padding:12px}
 .card-name{font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .card-spec{font-size:11px;color:#999;margin-bottom:8px}
-.price-row{display:flex;align-items:center;gap:6px}
 .price{font-size:16px;font-weight:800;color:#D32F2F}
-.old-price{font-size:11px;color:#999;text-decoration:line-through}
 
 /* 标签：新品 / 热销 / 折扣 */
 .tag{position:absolute;background:#D32F2F;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}
@@ -40,6 +39,11 @@ body{background:#F7F8FA;color:#111;padding-bottom:40px}
 
 /* 卡片容器相对定位 */
 .card{position:relative}
+
+/* 图片放大弹窗 */
+.img-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-img{max-width:90%;max-height:90%;object-contain;border-radius:8px}
+.close-btn{position:absolute;top:20px;right:20px;color:#fff;font-size:24px;cursor:pointer;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 
@@ -47,61 +51,102 @@ body{background:#F7F8FA;color:#111;padding-bottom:40px}
 
 <div class="header">
   <div class="brand">sengo 森林食品</div>
-  <div class="slogan">北纬47°兴安岭原始森林 · 伊春产地直供</div>
+  <div class="slogan">伊春礼物 · 天然健康 · 原产地直供</div>
 </div>
 
 <div class="tabs" id="tabs"></div>
 <div class="goods-grid" id="list"></div>
 
+<!-- 图片放大弹窗 -->
+<div class="img-modal" id="imgModal">
+  <span class="close-btn" id="closeBtn">&times;</span>
+  <img class="modal-img" id="modalImg" src="" alt="商品大图">
+</div>
+
 <script>
-// 商品数据
+// 表格提取的商品数据（按CSV内容生成）
 const goods = [
   {
     cate: "坚果",
     name: "野生榛子",
     spec: "500g/袋",
     price: "39.9",
-    oldPrice: "59.0",
     img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png",
     tag: "new"
+  },
+  {
+    cate: "坚果",
+    name: "开口松子",
+    spec: "500g/袋",
+    price: "45.9",
+    img: "https://s41.ax1x.com/2026/04/08/peUoFdU.png",
+    tag: "hot"
   },
   {
     cate: "菌菇",
     name: "东北黑木耳",
     spec: "250g/袋",
     price: "29.9",
-    oldPrice: "45.0",
     img: "https://s41.ax1x.com/2026/04/08/peUIvGj.png",
     tag: "hot"
+  },
+  {
+    cate: "菌菇",
+    name: "野生香菇",
+    spec: "200g/袋",
+    price: "32.9",
+    img: "https://s41.ax1x.com/2026/04/08/peUoiZT.png",
+    tag: ""
   },
   {
     cate: "饮品",
     name: "野生蓝莓汁",
     spec: "250ml/瓶",
     price: "29.9",
-    oldPrice: "39.9",
     img: "https://s41.ax1x.com/2026/04/08/peUoCLV.png",
     tag: "discount"
+  },
+  {
+    cate: "饮品",
+    name: "白桦树汁",
+    spec: "300ml/瓶",
+    price: "19.9",
+    img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png",
+    tag: "new"
   },
   {
     cate: "果酒",
     name: "蓝莓果酒",
     spec: "低度微醺",
     price: "49.0",
-    oldPrice: "69.0",
     img: "https://s41.ax1x.com/2026/04/08/peUoiZT.png",
     tag: ""
+  },
+  {
+    cate: "果酒",
+    name: "山葡萄酒",
+    spec: "500ml/瓶",
+    price: "59.0",
+    img: "https://s41.ax1x.com/2026/04/08/peUIvGj.png",
+    tag: "new"
   },
   {
     cate: "滋补",
     name: "鹿茸片",
     spec: "精选好货",
     price: "128.0",
-    oldPrice: "198.0",
     img: "https://s41.ax1x.com/2026/04/08/peUoFdU.png",
     tag: "new"
+  },
+  {
+    cate: "滋补",
+    name: "人参片",
+    spec: "100g/盒",
+    price: "89.0",
+    img: "https://s41.ax1x.com/2026/04/08/peUo9s0.png",
+    tag: "hot"
   }
-]
+];
 
 // 渲染分类
 const cateList = [...new Set(goods.map(i=>i.cate))]
@@ -113,20 +158,37 @@ tabsEl.innerHTML = cateList.map((c,i)=>`
 // 渲染商品
 function showList(cate){
   const list = goods.filter(g=>g.cate==cate)
-  document.getElementById('list').innerHTML = list.map(g=>`
+  const listEl = document.getElementById('list')
+  listEl.innerHTML = list.map(g=>`
     <div class="card">
       ${g.tag?`<div class="tag ${g.tag}">${g.tag=='new'?'新品':g.tag=='hot'?'热销':'折扣'}</div>`:''}
-      <img class="card-img" src="${g.img}" />
+      <img class="card-img" src="${g.img}" data-src="${g.img}" alt="${g.name}" />
       <div class="card-info">
         <div class="card-name">${g.name}</div>
         <div class="card-spec">${g.spec}</div>
-        <div class="price-row">
-          <div class="price">¥${g.price}</div>
-          <div class="old-price">¥${g.oldPrice}</div>
-        </div>
+        <div class="price">¥${g.price}</div>
       </div>
     </div>
   `).join('')
+
+  // 绑定图片点击放大事件
+  document.querySelectorAll('.card-img').forEach(img=>{
+    img.onclick = ()=>{
+      document.getElementById('modalImg').src = img.dataset.src
+      document.getElementById('imgModal').style.display = 'flex'
+    }
+  })
+}
+
+// 关闭图片弹窗
+document.getElementById('closeBtn').onclick = ()=>{
+  document.getElementById('imgModal').style.display = 'none'
+}
+// 点击弹窗背景关闭
+document.getElementById('imgModal').onclick = (e)=>{
+  if(e.target === document.getElementById('imgModal')){
+    document.getElementById('imgModal').style.display = 'none'
+  }
 }
 
 // 切换分类
