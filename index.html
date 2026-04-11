@@ -5,45 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>sengo 森林食品</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-body{background:#F7F8FA;color:#111;padding-bottom:40px}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { background: #F7F8FA; color: #111; padding-bottom: 40px; }
 
 /* 顶部品牌栏 */
-.header{background:#2D7D45;padding:18px 16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
-.brand{font-size:20px;font-weight:800;color:#fff;letter-spacing:1px}
-.slogan{font-size:12px;color:#fff;margin-top:4px;opacity:0.9}
+.header { background: #2D7D45; padding: 18px 16px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+.brand { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 1px; }
+.slogan { font-size: 12px; color: #fff; margin-top: 4px; opacity: 0.9; }
 
 /* 分类栏 */
-.tabs{padding:14px 12px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;background:#fff;margin-bottom:12px}
-.tabs::-webkit-scrollbar{display:none}
-.tab{white-space:nowrap;padding:10px 18px;border-radius:20px;background:#F1F3F5;font-size:14px;font-weight:500;color:#444;cursor:pointer}
-.tab.active{background:#2D7D45;color:#fff}
+.tabs { padding: 14px 12px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; background: #fff; margin-bottom: 12px; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { white-space: nowrap; padding: 10px 18px; border-radius: 20px; background: #F1F3F5; font-size: 14px; font-weight: 500; color: #444; cursor: pointer; }
+.tab.active { background: #2D7D45; color: #fff; }
 
 /* 商品网格 */
-.goods-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 12px}
+.goods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 12px; }
 
 /* 商品卡片 */
-.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.04)}
-.card-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#f2f2f2;cursor:pointer;transition:transform 0.2s ease}
-.card-img:hover{transform:scale(1.02)}
-.card-info{padding:12px}
-.card-name{font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-.card-spec{font-size:11px;color:#999;margin-bottom:8px}
-.price{font-size:16px;font-weight:800;color:#D32F2F}
-
-/* 标签 */
-.tag{position:absolute;background:#D32F2F;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}
-.tag.new{background:#2D7D45}
-.tag.hot{background:#D32F2F}
-.card{position:relative}
+.card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 3px 12px rgba(0,0,0,0.04); position: relative; }
+.card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #f2f2f2; cursor: pointer; }
+.card-info { padding: 12px; }
+.card-name { font-size: 14px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.card-spec { font-size: 11px; color: #999; margin-bottom: 8px; }
+.price { font-size: 16px; font-weight: 800; color: #D32F2F; }
 
 /* 图片放大弹窗 */
-.img-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-img{max-width:90%;max-height:90%;object-fit:contain;border-radius:8px}
-.close-btn{position:absolute;top:20px;right:20px;color:#fff;font-size:24px;cursor:pointer;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center}
+.img-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; }
+.close-btn { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 24px; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
 </style>
 </head>
-
 <body>
 
 <div class="header">
@@ -54,60 +46,59 @@ body{background:#F7F8FA;color:#111;padding-bottom:40px}
 <div class="tabs" id="tabs"></div>
 <div class="goods-grid" id="list"></div>
 
-<!-- 图片放大弹窗 -->
 <div class="img-modal" id="imgModal">
   <span class="close-btn" id="closeBtn">&times;</span>
   <img class="modal-img" id="modalImg" src="" alt="商品大图">
 </div>
 
 <script>
-// 100%按表格+图床链接生成
+// 全部分类+商品+正确s3.bmp.ovh直链
 const goods = [
   // ========== 白桦树汁 ==========
-  { cate:"白桦树汁", name:"瑗之桦白桦树汁", spec:"315ml*6/箱", price:"86", img:"https://s3.bmp.ovh/2026/04/10/JAv93Sjd.png", tag:"" },
-  { cate:"白桦树汁", name:"伊村山野白桦树汁", spec:"320ml*6/箱", price:"58", img:"https://s3.bmp.ovh/2026/04/10/5I4VkLoB.png", tag:"" },
-  { cate:"白桦树汁", name:"志有初桦白桦树汁", spec:"248ml*6/箱", price:"38", img:"https://s3.bmp.ovh/2026/04/10/8HNGvpDz.png", tag:"" },
-  { cate:"白桦树汁", name:"九峰山白桦树汁包", spec:"190ml*9/箱", price:"65", img:"https://s3.bmp.ovh/2026/04/10/4dwPs5P3.png", tag:"" },
-  { cate:"白桦树汁", name:"九峰山白桦树汁瓶", spec:"320ml*6/箱", price:"55", img:"https://s3.bmp.ovh/2026/04/10/Dnf5T37c.png", tag:"" },
-  { cate:"白桦树汁", name:"九峰山人参白桦树汁", spec:"320ml*6/箱", price:"68", img:"https://s3.bmp.ovh/2026/04/10/FSWOCxY1.png", tag:"" },
-  { cate:"白桦树汁", name:"林下盛都白桦树汁", spec:"310ml*6/箱", price:"56", img:"https://s3.bmp.ovh/2026/04/10/E9G710rX.png", tag:"" },
-  { cate:"白桦树汁", name:"即淳白桦树汁", spec:"320ml*6/箱", price:"38", img:"https://s3.bmp.ovh/2026/04/10/cUvrXtxX.png", tag:"" },
-  { cate:"白桦树汁", name:"林都伊村白桦树汁", spec:"330ml*6/箱", price:"56", img:"https://s3.bmp.ovh/2026/04/10/38q7JcP0.png", tag:"" },
-  { cate:"白桦树汁", name:"伊北白桦树汁", spec:"330ml*6/箱", price:"56", img:"https://s3.bmp.ovh/2026/04/10/m66XKVQt.png", tag:"" },
-  { cate:"白桦树汁", name:"志有白桦树汁", spec:"330ml*6/箱", price:"56", img:"https://s3.bmp.ovh/2026/04/10/rh2t6jzX.png", tag:"" },
-  { cate:"白桦树汁", name:"唤醒森林白桦树汁", spec:"330ml*6/箱", price:"55", img:"https://s3.bmp.ovh/2026/04/10/nNgqWTcm.png", tag:"" },
-  { cate:"白桦树汁", name:"嘉桦白桦树汁", spec:"320ml*6/箱", price:"152", img:"https://s3.bmp.ovh/2026/04/10/xeLrIfWw.png", tag:"" },
-  { cate:"白桦树汁", name:"志有白桦树汁（春）", spec:"750ml/盒", price:"25", img:"https://s3.bmp.ovh/2026/04/10/LuvsXIjg.png", tag:"" },
-  { cate:"白桦树汁", name:"嘉桦卡特罐白桦树汁", spec:"230ml*6/盒", price:"132", img:"https://s3.bmp.ovh/2026/04/10/Humj7U04.png", tag:"" },
-  { cate:"白桦树汁", name:"伊北白桦树汁浓缩液", spec:"50ml*8支/盒", price:"98", img:"https://s3.bmp.ovh/2026/04/10/JAtuMnaH.png", tag:"" },
-  { cate:"白桦树汁", name:"嘉桦白桦树汁浓缩液", spec:"50ml*8支/盒", price:"168", img:"https://s3.bmp.ovh/2026/04/10/1jgBLeb7.png", tag:"" },
-  { cate:"白桦树汁", name:"瑗之桦白桦树汁浓缩液", spec:"50ml*8支/盒", price:"158", img:"https://s3.bmp.ovh/2026/04/10/BpsDI7zF.png", tag:"" },
-  { cate:"白桦树汁", name:"白桦依然白桦树汁浓缩液", spec:"50ml*6支/盒", price:"108", img:"https://s3.bmp.ovh/2026/04/10/bf5ii0Vp.png", tag:"" },
-  { cate:"白桦树汁", name:"志有白桦树汁浓缩液", spec:"50ml*6支/盒", price:"95", img:"https://s3.bmp.ovh/2026/04/10/0gS4iYWE.png", tag:"" },
-  { cate:"白桦树汁", name:"森林盛宴白桦树汁浓缩液", spec:"50ml*8支/盒", price:"79", img:"https://s3.bmp.ovh/2026/04/11/rrl0h2H.png", tag:"" },
-  { cate:"白桦树汁", name:"森林盛宴白桦树汁酵素", spec:"50ml*8支/盒", price:"89", img:"https://s3.bmp.ovh/2026/04/11/3Auh1XJ.png", tag:"" },
+  { cate:"白桦树汁", name:"瑗之桦白桦树汁", spec:"315ml*6/箱", price:"86", img:"https://s3.bmp.ovh/2026/04/10/JAv93Sjd.png" },
+  { cate:"白桦树汁", name:"伊村山野白桦树汁", spec:"320ml*6/箱", price:"58", img:"https://s3.bmp.ovh/2026/04/10/5I4VkLoB.png" },
+  { cate:"白桦树汁", name:"志有初桦白桦树汁", spec:"248ml*6/箱", price:"38", img:"https://s3.bmp.ovh/2026/04/10/8HNGvpDz.png" },
+  { cate:"白桦树汁", name:"九峰山白桦树汁包", spec:"190ml*9/箱", price:"65", img:"https://s3.bmp.ovh/2026/04/10/4dwPs5P3.png" },
+  { cate:"白桦树汁", name:"九峰山白桦树汁瓶", spec:"320ml*6/箱", price:"55", img:"https://s3.bmp.ovh/2026/04/10/Dnf5T37c.png" },
+  { cate:"白桦树汁", name:"九峰山人参白桦树汁", spec:"320ml*6/箱", price:"68", img:"https://s3.bmp.ovh/2026/04/10/FSWOCxY1.png" },
+  { cate:"白桦树汁", name:"林下盛都白桦树汁", spec:"310ml*6/箱", price:"56", img:"https://s3.bmp.ovh/2026/04/10/E9G710rX.png" },
+  { cate:"白桦树汁", name:"即淳白桦树汁", spec:"320ml*6/箱", price:"38", img:"https://s3.bmp.ovh/2026/04/10/cUvrXtxX.png" },
+  { cate:"白桦树汁", name:"林都伊村白桦树汁", spec:"330ml*6/箱", price:"56", img:"https://s3.bmp.ovh/2026/04/10/38q7JcP0.png" },
+  { cate:"白桦树汁", name:"伊北白桦树汁", spec:"330ml*6/箱", price:"56", img:"https://s3.bmp.ovh/2026/04/10/m66XKVQt.png" },
+  { cate:"白桦树汁", name:"志有白桦树汁", spec:"330ml*6/箱", price:"56", img:"https://s3.bmp.ovh/2026/04/10/rh2t6jzX.png" },
+  { cate:"白桦树汁", name:"唤醒森林白桦树汁", spec:"330ml*6/箱", price:"55", img:"https://s3.bmp.ovh/2026/04/10/nNgqWTcm.png" },
+  { cate:"白桦树汁", name:"嘉桦白桦树汁", spec:"320ml*6/箱", price:"152", img:"https://s3.bmp.ovh/2026/04/10/xeLrIfWw.png" },
+  { cate:"白桦树汁", name:"志有白桦树汁（春）", spec:"750ml/盒", price:"25", img:"https://s3.bmp.ovh/2026/04/10/LuvsXIjg.png" },
+  { cate:"白桦树汁", name:"嘉桦卡特罐白桦树汁", spec:"230ml*6/盒", price:"132", img:"https://s3.bmp.ovh/2026/04/10/Humj7U04.png" },
+  { cate:"白桦树汁", name:"伊北白桦树汁浓缩液", spec:"50ml*8支/盒", price:"98", img:"https://s3.bmp.ovh/2026/04/10/JAtuMnaH.png" },
+  { cate:"白桦树汁", name:"嘉桦白桦树汁浓缩液", spec:"50ml*8支/盒", price:"168", img:"https://s3.bmp.ovh/2026/04/10/1jgBLeb7.png" },
+  { cate:"白桦树汁", name:"瑗之桦白桦树汁浓缩液", spec:"50ml*8支/盒", price:"158", img:"https://s3.bmp.ovh/2026/04/10/BpsDI7zF.png" },
+  { cate:"白桦树汁", name:"白桦依然白桦树汁浓缩液", spec:"50ml*6支/盒", price:"108", img:"https://s3.bmp.ovh/2026/04/10/bf5ii0Vp.png" },
+  { cate:"白桦树汁", name:"志有白桦树汁浓缩液", spec:"50ml*6支/盒", price:"95", img:"https://s3.bmp.ovh/2026/04/10/0gS4iYWE.png" },
+  { cate:"白桦树汁", name:"森林盛宴白桦树汁浓缩液", spec:"50ml*8支/盒", price:"79", img:"https://s3.bmp.ovh/2026/04/11/rrl0h2H.png" },
+  { cate:"白桦树汁", name:"森林盛宴白桦树汁酵素", spec:"50ml*8支/盒", price:"89", img:"https://s3.bmp.ovh/2026/04/11/3Auh1XJ.png" },
 
   // ========== 果汁饮品 ==========
-  { cate:"果汁饮品", name:"伊村山野经典蓝莓果汁", spec:"248ml*12/箱", price:"62", img:"https://s3.bmp.ovh/2026/04/11/w3tmzFj.png", tag:"" },
-  { cate:"果汁饮品", name:"伊村山野蓝莓果汁", spec:"350ml*8/箱", price:"124", img:"https://s3.bmp.ovh/2026/04/11/irJB32.png", tag:"" },
-  { cate:"果汁饮品", name:"伊村山野蓝莓果浆饮料", spec:"420ml*8/箱", price:"98", img:"https://s3.bmp.ovh/2026/04/11/CYPwDL.png", tag:"" },
-  { cate:"果汁饮品", name:"伊村山野儿童标蓝莓果汁", spec:"300ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/dP5Kiu9.png", tag:"" },
-  { cate:"果汁饮品", name:"伊村山野猫头鹰蓝莓果汁", spec:"248ml*6/箱", price:"59", img:"https://s3.bmp.ovh/2026/04/11/qhwJua.png", tag:"" },
-  { cate:"果汁饮品", name:"志有冻梨汁", spec:"320ml*6/箱", price:"48", img:"https://s3.bmp.ovh/2026/04/11/1cfgD.png", tag:"" },
-  { cate:"果汁饮品", name:"忠芝树莓汁", spec:"480ml*8/箱", price:"75", img:"https://s3.bmp.ovh/2026/04/11/VqHLC.png", tag:"" },
-  { cate:"果汁饮品", name:"忠芝家和往事兴树莓汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/5Q2cBF.png", tag:"" },
-  { cate:"果汁饮品", name:"忠芝家和往事兴蓝莓汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/hdvmUb.png", tag:"" },
-  { cate:"果汁饮品", name:"忠芝家和往事兴冻梨汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/Z2SzF3.png", tag:"" },
-  { cate:"果汁饮品", name:"忠芝家和往事兴蓝靛果汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/srcvTb.png", tag:"" },
-  { cate:"果汁饮品", name:"忠芝梦想你蓝莓果汁", spec:"330ml*8/箱", price:"76", img:"https://s3.bmp.ovh/2026/04/11/4Vqm3q.png", tag:"" },
-  { cate:"果汁饮品", name:"九峰山人参雪莲果汁", spec:"280ml*4/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/SP8X5pA.png", tag:"" },
-  { cate:"果汁饮品", name:"蓝韵森林蓝莓果汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/N1idTg.png", tag:"" },
-  { cate:"果汁饮品", name:"蓝韵森林沙棘果汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/S8I15B.png", tag:"" },
-  { cate:"果汁饮品", name:"森骄益生菌发酵蓝莓汁", spec:"130ml*4/盒", price:"32", img:"https://s3.bmp.ovh/2026/04/11/027aXA.png", tag:"" },
-  { cate:"果汁饮品", name:"九峰山雪莲果汁", spec:"190ml*7/盒", price:"58", img:"https://s3.bmp.ovh/2026/04/11/c7K3Rui.png", tag:"" },
+  { cate:"果汁饮品", name:"伊村山野经典蓝莓果汁", spec:"248ml*12/箱", price:"62", img:"https://s3.bmp.ovh/2026/04/11/w3tmzFj.png" },
+  { cate:"果汁饮品", name:"伊村山野蓝莓果汁", spec:"350ml*8/箱", price:"124", img:"https://s3.bmp.ovh/2026/04/11/irJB32.png" },
+  { cate:"果汁饮品", name:"伊村山野蓝莓果浆饮料", spec:"420ml*8/箱", price:"98", img:"https://s3.bmp.ovh/2026/04/11/CYPwDL.png" },
+  { cate:"果汁饮品", name:"伊村山野儿童标蓝莓果汁", spec:"300ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/dP5Kiu9.png" },
+  { cate:"果汁饮品", name:"伊村山野猫头鹰蓝莓果汁", spec:"248ml*6/箱", price:"59", img:"https://s3.bmp.ovh/2026/04/11/qhwJua.png" },
+  { cate:"果汁饮品", name:"志有冻梨汁", spec:"320ml*6/箱", price:"48", img:"https://s3.bmp.ovh/2026/04/11/1cfgD.png" },
+  { cate:"果汁饮品", name:"忠芝树莓汁", spec:"480ml*8/箱", price:"75", img:"https://s3.bmp.ovh/2026/04/11/VqHLC.png" },
+  { cate:"果汁饮品", name:"忠芝家和往事兴树莓汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/5Q2cBF.png" },
+  { cate:"果汁饮品", name:"忠芝家和往事兴蓝莓汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/hdvmUb.png" },
+  { cate:"果汁饮品", name:"忠芝家和往事兴冻梨汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/Z2SzF3.png" },
+  { cate:"果汁饮品", name:"忠芝家和往事兴蓝靛果汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/srcvTb.png" },
+  { cate:"果汁饮品", name:"忠芝梦想你蓝莓果汁", spec:"330ml*8/箱", price:"76", img:"https://s3.bmp.ovh/2026/04/11/4Vqm3q.png" },
+  { cate:"果汁饮品", name:"九峰山人参雪莲果汁", spec:"280ml*4/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/SP8X5pA.png" },
+  { cate:"果汁饮品", name:"蓝韵森林蓝莓果汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/N1idTg.png" },
+  { cate:"果汁饮品", name:"蓝韵森林沙棘果汁", spec:"330ml*8/箱", price:"45", img:"https://s3.bmp.ovh/2026/04/11/S8I15B.png" },
+  { cate:"果汁饮品", name:"森骄益生菌发酵蓝莓汁", spec:"130ml*4/盒", price:"32", img:"https://s3.bmp.ovh/2026/04/11/027aXA.png" },
+  { cate:"果汁饮品", name:"九峰山雪莲果汁", spec:"190ml*7/盒", price:"58", img:"https://s3.bmp.ovh/2026/04/11/c7K3Rui.png" },
 
   // ========== 原浆果饮 ==========
-  { cate:"原浆果饮", name:"志有蓝莓原浆", spec:"320ml*6/箱", price:"68", img:"https://s3.bmp.ovh/2026/04/11/gwSAImq.png", tag:"" }
+  { cate:"原浆果饮", name:"志有蓝莓原浆", spec:"320ml*6/箱", price:"68", img:"https://s3.bmp.ovh/2026/04/11/gwSAImq.png" }
 ];
 
 // 渲染分类
@@ -124,8 +115,7 @@ function renderGoodsByCate(targetCate) {
 
   goodsListEl.innerHTML = targetGoods.map(good => `
     <div class="card">
-      ${good.tag ? `<div class="tag ${good.tag}">${good.tag === 'new' ? '新品' : good.tag === 'hot' ? '热销' : '折扣'}</div>` : ''}
-      <img class="card-img" src="${good.img}" data-src="${good.img}" alt="${good.name}">
+      <img class="card-img" src="${good.img}" alt="${good.name}">
       <div class="card-info">
         <div class="card-name">${good.name}</div>
         <div class="card-spec">${good.spec}</div>
@@ -137,7 +127,7 @@ function renderGoodsByCate(targetCate) {
   // 绑定图片放大事件
   document.querySelectorAll('.card-img').forEach(img => {
     img.addEventListener('click', () => {
-      document.getElementById('modalImg').src = img.dataset.src;
+      document.getElementById('modalImg').src = img.src;
       document.getElementById('imgModal').style.display = 'flex';
     });
   });
@@ -165,6 +155,5 @@ document.getElementById('imgModal').addEventListener('click', (e) => {
 // 初始渲染
 renderGoodsByCate(cateList[0]);
 </script>
-
 </body>
 </html>
