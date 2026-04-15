@@ -1,111 +1,699 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 加速核心 -->
-<meta http-equiv="Cache-Control" content="max-age=31536000">
-<link rel="preconnect" href="https://sengo-food.github.io">
-<title>sengo 森林食品</title>
-<style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif }
-body { background:#f7f8fa;color:#111;padding-bottom:40px }
-.header { background:#2D7D45;padding:18px 16px;text-align:center }
-.brand { font-size:20px;font-weight:700;color:#fff }
-.slogan { font-size:13px;color:rgba(255,255,255,.85);margin-top:4px }
-.tabs { display:flex;gap:10px;padding:14px 12px;background:#fff;overflow-x:auto }
-.tabs::-webkit-scrollbar { display:none }
-.tab { padding:8px 16px;border-radius:20px;background:#f1f3f5;font-size:14px;color:#444;cursor:pointer;white-space:nowrap }
-.tab.active { background:#2D7D45;color:#fff }
-.goods-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px }
-.card { background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,.04) }
-.card-img { width:100%;aspect-ratio:1/1;object-fit:cover;background:#f2f2f2 }
-.card-info { padding:12px }
-.card-name { font-size:14px;font-weight:700;margin-bottom:6px }
-.card-spec { font-size:13px;color:#999;margin-bottom:8px }
-.price { font-size:20px;font-weight:700;color:#D32F2F }
-.img-modal { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:20px;z-index:999 }
-.modal-img { max-width:90%;max-height:90%;border-radius:8px }
-.close-btn { position:absolute;top:20px;right:20px;color:#fff;font-size:24px;cursor:pointer;background:rgba(255,255,255,.2);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- 强制不缓存，每次都加载最新 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>sengo 森林食品</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background: #f7f7f7;
+      color: #111;
+      padding-bottom: 40px;
+    }
+    .header {
+      background: #2D7D45;
+      padding: 16px;
+      text-align: center;
+      color: white;
+    }
+    .brand {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .slogan {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 4px;
+    }
+    /* 分类栏（带横向滑动） */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      padding: 14px 12px;
+      background: white;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 12px;
+    }
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+    .tab {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: #F1F3F5;
+      font-size: 14px;
+      color: #444;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: #2D7D45;
+      color: white;
+    }
+    /* 商品网格 */
+    .goods-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 0 12px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      background: #f2f2f2;
+      loading: lazy; /* 懒加载，不卡首屏 */
+    }
+    .card-info {
+      padding: 12px;
+    }
+    .card-name {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .card-spec {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    .price {
+      font-size: 20px;
+      font-weight: bold;
+      color: #D32F2F;
+    }
+    /* 大图预览 */
+    .img-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .img-modal img {
+      max-width: 90%;
+      max-height: 90%;
+    }
+  </style>
 </head>
 <body>
+  <div class="header">
+    <div class="brand">sengo 森林食品</div>
+    <div class="slogan">北纬47°兴安岭原始森林 · 伊春产地直供</div>
+  </div>
 
-<div class="header">
-  <div class="brand">sengo 森林食品</div>
-  <div class="slogan">北纬47°兴安岭原始森林 · 伊春直供</div>
-</div>
+  <!-- 分类标签栏 -->
+  <div class="tabs">
+    <div class="tab active" data-target="baihua">白桦树汁</div>
+    <div class="tab" data-target="guozhi">果汁饮品</div>
+    <div class="tab" data-target="yuanjiang">原浆果饮</div>
+    <div class="tab" data-target="jiupi">果汁啤酒</div>
+    <div class="tab" data-target="guojiang">果肉果酱</div>
+    <div class="tab" data-target="guantou">果肉罐头</div>
+  </div>
 
-<div class="tabs" id="tabs"></div>
-<div class="goods-grid" id="list"></div>
-
-<div class="img-modal" id="imgModal">
-  <span class="close-btn" id="closeBtn">&times;</span>
-  <img class="modal-img" id="modalImg" src="">
-</div>
-
-<script>
-const goods = [
-  { cate: "白桦树汁", name: "瑗之桦白桦树汁", spec: "315ml*6/箱", price: "86", img: "yuanzhi_baihua.png" },
-  { cate: "白桦树汁", name: "伊村山野白桦树汁", spec: "320ml*6/箱", price: "58", img: "yicun_shanye_baihua.png" },
-  { cate: "白桦树汁", name: "志有初桦白桦树汁", spec: "248ml*6/箱", price: "38", img: "zhiyou_chuhua_baihua.png" },
-  { cate: "白桦树汁", name: "九峰山白桦树汁包", spec: "190ml*9/箱", price: "65", img: "jiufengshan_baihua_bag.png" },
-  { cate: "白桦树汁", name: "九峰山白桦树汁瓶", spec: "320ml*6/箱", price: "55", img: "jiufengshan_baihua_ping.png" },
-  { cate: "白桦树汁", name: "九峰山人参白桦树汁", spec: "320ml*6/箱", price: "68", img: "jiufengshan_renshen_baihua.png" },
-  { cate: "白桦树汁", name: "林下盛都白桦树汁", spec: "310ml*6/箱", price: "56", img: "linxiashengdu_baihua.png" },
-  { cate: "白桦树汁", name: "即淳白桦树汁", spec: "320ml*6/箱", price: "38", img: "jichun_baihua.png" },
-  { cate: "白桦树汁", name: "林都伊村白桦树汁", spec: "330ml*6/箱", price: "56", img: "lindu_yicun_baihua.png" },
-  { cate: "白桦树汁", name: "伊北白桦树汁", spec: "330ml*6/箱", price: "56", img: "yibei_baihua.png" },
-  { cate: "白桦树汁", name: "志有白桦树汁", spec: "330ml*6/箱", price: "56", img: "zhiyou_baihua.png" },
-  { cate: "白桦树汁", name: "唤醒森林白桦树汁", spec: "330ml*6/箱", price: "55", img: "huanxing_senlin_baihua.png" },
-  { cate: "白桦树汁", name: "嘉桦白桦树汁", spec: "320ml*6/箱", price: "152", img: "jiahua_baihua.png" },
-  { cate: "白桦树汁", name: "志有白桦树汁春", spec: "750ml/盒", price: "25", img: "zhiyou_baihua_spring.png" },
-  { cate: "白桦树汁", name: "嘉桦卡特罐白桦树汁", spec: "230ml*6/盒", price: "132", img: "jiahua_kate_baihua.png" },
-  { cate: "白桦树汁", name: "伊北白桦树汁浓缩液", spec: "50ml*8支/盒", price: "98", img: "yibei_baihua_nongsuo.png" },
-  { cate: "白桦树汁", name: "嘉桦白桦树汁浓缩液", spec: "50ml*8支/盒", price: "168", img: "jiahua_baihua_nongsuo.png" },
-  { cate: "白桦树汁", name: "瑗之桦白桦树汁浓缩液", spec: "50ml*8支/盒", price: "158", img: "yuanzhi_baihua_nongsuo.png" },
-  { cate: "白桦树汁", name: "白桦依然白桦树汁浓缩液", spec: "50ml*6支/盒", price: "108", img: "baihua_yiran_nongsuo.png" },
-  { cate: "白桦树汁", name: "志有白桦树汁浓缩液", spec: "50ml*6支/盒", price: "95", img: "zhiyou_baihua_nongsuo.png" },
-  { cate: "白桦树汁", name: "森林盛宴白桦树汁浓缩液", spec: "50ml*8支/盒", price: "79", img: "shengyan_baihua_nongsuo.png" },
-  { cate: "白桦树汁", name: "森林盛宴白桦树汁酵素", spec: "50ml*8支/盒", price: "89", img: "shengyan_baihua_jiaoSuv=2.png" },
-];
-
-const cateList = [...new Set(goods.map(i=>i.cate))];
-const tabsEl = document.getElementById('tabs');
-tabsEl.innerHTML = cateList.map((c,i)=>`<div class="tab ${i===0?'active':''}" data-cate="${c}">${c}</div>`).join('');
-
-function render(cate){
-  const list=goods.filter(i=>i.cate===cate);
-  document.getElementById('list').innerHTML=list.map(item=>`
-    <div class="card">
-      <img class="card-img" loading="lazy" decoding="async" src="${item.img}" alt="${item.name}">
+  <!-- 商品列表 -->
+  <div class="goods-grid">
+    <!-- ========== 白桦树汁 ========== -->
+    <div class="card category-baihua">
+      <img class="card-img" src="yuanzhi_baihua.png?v=1.0" alt="瑗之桦白桦树汁" />
       <div class="card-info">
-        <div class="card-name">${item.name}</div>
-        <div class="card-spec">${item.spec}</div>
-        <div class="price">¥${item.price}</div>
+        <div class="card-name">瑗之桦白桦树汁</div>
+        <div class="card-spec">315ml*6/箱</div>
+        <div class="price">¥86</div>
       </div>
-    </div>`).join('');
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="yicun_shanye_baihua.png?v=1.0" alt="伊村山野白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">伊村山野白桦树汁</div>
+        <div class="card-spec">320ml*6/箱</div>
+        <div class="price">¥58</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="zhiyou_chuhua_baihua.png?v=1.0" alt="志有初榨白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">志有初榨白桦树汁</div>
+        <div class="card-spec">248ml*6/箱</div>
+        <div class="price">¥38</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="jiufengshan_baihua_bag.png?v=1.0" alt="九峰山白桦树汁包" />
+      <div class="card-info">
+        <div class="card-name">九峰山白桦树汁包</div>
+        <div class="card-spec">190ml*9/箱</div>
+        <div class="price">¥65</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="jiufengshan_baihua_ping.png?v=1.0" alt="九峰山白桦树汁瓶" />
+      <div class="card-info">
+        <div class="card-name">九峰山白桦树汁瓶</div>
+        <div class="card-spec">320ml*6/箱</div>
+        <div class="price">¥55</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="jiufengshan_renshen_baihua.png?v=1.0" alt="九峰山人参白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">九峰山人参白桦树汁</div>
+        <div class="card-spec">320ml*6/箱</div>
+        <div class="price">¥68</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="linxia_shengdu_baihua.png?v=1.0" alt="林下盛都白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">林下盛都白桦树汁</div>
+        <div class="card-spec">310ml*6/箱</div>
+        <div class="price">¥56</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="jichun_baihua.png?v=1.0" alt="即淳白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">即淳白桦树汁</div>
+        <div class="card-spec">320ml*6/箱</div>
+        <div class="price">¥38</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="lindu_yicun_baihua.png?v=1.0" alt="林都伊村白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">林都伊村白桦树汁</div>
+        <div class="card-spec">330ml*6/箱</div>
+        <div class="price">¥56</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="yibei_baihua.png?v=1.0" alt="伊北白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">伊北白桦树汁</div>
+        <div class="card-spec">330ml*6/箱</div>
+        <div class="price">¥56</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="zhiyou_baihua.png?v=1.0" alt="志有白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">志有白桦树汁</div>
+        <div class="card-spec">330ml*6/箱</div>
+        <div class="price">¥56</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="huanxing_senlin_baihua.png?v=1.0" alt="唤醒森林白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">唤醒森林白桦树汁</div>
+        <div class="card-spec">330ml*6/箱</div>
+        <div class="price">¥55</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="jiahua_baihua.png?v=1.0" alt="嘉桦白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">嘉桦白桦树汁</div>
+        <div class="card-spec">320ml*6/箱</div>
+        <div class="price">¥152</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="zhiyou_baihua_spring.png?v=1.0" alt="志有白桦树汁春" />
+      <div class="card-info">
+        <div class="card-name">志有白桦树汁春</div>
+        <div class="card-spec">750ml/盒</div>
+        <div class="price">¥25</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="jiahua_kate_baihua.png?v=1.0" alt="嘉桦卡特罐白桦树汁" />
+      <div class="card-info">
+        <div class="card-name">嘉桦卡特罐白桦树汁</div>
+        <div class="card-spec">230ml/盒</div>
+        <div class="price">¥132</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="yibei_baihua_nongsuo.png?v=1.0" alt="伊北白桦树汁浓缩液" />
+      <div class="card-info">
+        <div class="card-name">伊北白桦树汁浓缩液</div>
+        <div class="card-spec">50ml*8支/盒</div>
+        <div class="price">¥98</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="jiahua_baihua_nongsuo.png?v=1.0" alt="嘉桦白桦树汁浓缩液" />
+      <div class="card-info">
+        <div class="card-name">嘉桦白桦树汁浓缩液</div>
+        <div class="card-spec">50ml*8支/盒</div>
+        <div class="price">¥168</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="yuanzhi_baihua_nongsuo.png?v=1.0" alt="瑗之桦白桦树汁浓缩液" />
+      <div class="card-info">
+        <div class="card-name">瑗之桦白桦树汁浓缩液</div>
+        <div class="card-spec">50ml*8支/盒</div>
+        <div class="price">¥158</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="baihua_yiran_nongsuo.png?v=1.0" alt="白桦依然白桦树汁浓缩液" />
+      <div class="card-info">
+        <div class="card-name">白桦依然白桦树汁浓缩液</div>
+        <div class="card-spec">50ml*6支/盒</div>
+        <div class="price">¥108</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="zhiyou_baihua_nongsuo.png?v=1.0" alt="志有白桦树汁浓缩液" />
+      <div class="card-info">
+        <div class="card-name">志有白桦树汁浓缩液</div>
+        <div class="card-spec">50ml*6支/盒</div>
+        <div class="price">¥95</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="shengyan_baihua_nongsuo.png?v=1.0" alt="森林盛宴白桦树汁浓缩液" />
+      <div class="card-info">
+        <div class="card-name">森林盛宴白桦树汁浓缩液</div>
+        <div class="card-spec">50ml*8支/盒</div>
+        <div class="price">¥79</div>
+      </div>
+    </div>
+    <div class="card category-baihua">
+      <img class="card-img" src="shengyan_baihua_jiaoSu.png?v=1.0" alt="森林盛宴白桦树汁酵素" />
+      <div class="card-info">
+        <div class="card-name">森林盛宴白桦树汁酵素</div>
+        <div class="card-spec">50ml*8支/盒</div>
+        <div class="price">¥89</div>
+      </div>
+    </div>
 
-  document.querySelectorAll('.card-img').forEach(img=>{
-    img.onclick=()=>{
-      document.getElementById('modalImg').src=img.src;
-      document.getElementById('imgModal').style.display='flex';
-    }
-  });
-}
+    <!-- ========== 果汁饮品 ========== -->
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="yicun_shanjing_lanmei_juice.png?v=1.0" alt="伊村山野经典蓝莓果汁" />
+      <div class="card-info">
+        <div class="card-name">伊村山野经典蓝莓果汁</div>
+        <div class="card-spec">248ml*12/箱</div>
+        <div class="price">¥62</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="yicun_shanye_lanmei_juice.png?v=1.0" alt="伊村山野蓝莓果汁" />
+      <div class="card-info">
+        <div class="card-name">伊村山野蓝莓果汁</div>
+        <div class="card-spec">350ml*8/箱</div>
+        <div class="price">¥124</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="yicun_lanmei_jiang_drink.png?v=1.0" alt="伊村山野蓝莓果浆饮料" />
+      <div class="card-info">
+        <div class="card-name">伊村山野蓝莓果浆饮料</div>
+        <div class="card-spec">420ml*8/箱</div>
+        <div class="price">¥98</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="yicun_ertong_lanmei_juice.png?v=1.0" alt="伊村山野标蓝莓果汁" />
+      <div class="card-info">
+        <div class="card-name">伊村山野标蓝莓果汁</div>
+        <div class="card-spec">300ml*8/箱</div>
+        <div class="price">¥45</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="yicun_maotouying_lanmei_juice.png?v=1.0" alt="伊村山野猫头鹰蓝莓果汁" />
+      <div class="card-info">
+        <div class="card-name">伊村山野猫头鹰蓝莓果汁</div>
+        <div class="card-spec">248ml*8/箱</div>
+        <div class="price">¥59</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="zhongzhi_dongli_juice.png?v=1.0" alt="志有冻梨汁" />
+      <div class="card-info">
+        <div class="card-name">志有冻梨汁</div>
+        <div class="card-spec">320ml*8/箱</div>
+        <div class="price">¥47</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="zhongzhi_shumei_juice.png?v=1.0" alt="志有树莓汁" />
+      <div class="card-info">
+        <div class="card-name">志有树莓汁</div>
+        <div class="card-spec">480ml*8/箱</div>
+        <div class="price">¥75</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="zhongzhi_hejia_shumei_juice.png?v=1.0" alt="志有家和往事树莓汁" />
+      <div class="card-info">
+        <div class="card-name">志有家和往事树莓汁</div>
+        <div class="card-spec">330ml*8/箱</div>
+        <div class="price">¥45</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="zhongzhi_hejia_lanmei_juice.png?v=1.0" alt="志有家和往事蓝莓汁" />
+      <div class="card-info">
+        <div class="card-name">志有家和往事蓝莓汁</div>
+        <div class="card-spec">330ml*8/箱</div>
+        <div class="price">¥45</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="zhongzhi_hejia_dongli_juice.png?v=1.0" alt="志有家和往事冻梨汁" />
+      <div class="card-info">
+        <div class="card-name">志有家和往事冻梨汁</div>
+        <div class="card-spec">330ml*8/箱</div>
+        <div class="price">¥45</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="zhongzhi_hejia_landian_juice.png?v=1.0" alt="志有家和往事蓝莓汁" />
+      <div class="card-info">
+        <div class="card-name">志有家和往事蓝莓汁</div>
+        <div class="card-spec">330ml*8/箱</div>
+        <div class="price">¥45</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="zhongzhi_mengxiang_lanmei_juice.png?v=1.0" alt="志有梦想蓝莓汁" />
+      <div class="card-info">
+        <div class="card-name">志有梦想蓝莓汁</div>
+        <div class="card-spec">330ml*8/箱</div>
+        <div class="price">¥76</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="jiufengshan_renshen_xuelian_juice.png?v=1.0" alt="九峰山雪莲果汁" />
+      <div class="card-info">
+        <div class="card-name">九峰山雪莲果汁</div>
+        <div class="card-spec">280ml*4/箱</div>
+        <div class="price">¥45</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="lanvun_shenlin_lanmei_juice.png?v=1.0" alt="蓝韵森林蓝莓果汁" />
+      <div class="card-info">
+        <div class="card-name">蓝韵森林蓝莓果汁</div>
+        <div class="card-spec">330ml*8/箱</div>
+        <div class="price">¥45</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="lanvun_shenlin_shaiji_juice.png?v=1.0" alt="蓝韵森林沙棘果汁" />
+      <div class="card-info">
+        <div class="card-name">蓝韵森林沙棘果汁</div>
+        <div class="card-spec">330ml*8/箱</div>
+        <div class="price">¥45</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="senjiao_yishengjun_lanmei_juice.png?v=1.0" alt="森娇益生菌发酵蓝莓汁" />
+      <div class="card-info">
+        <div class="card-name">森娇益生菌发酵蓝莓汁</div>
+        <div class="card-spec">130ml*4/盒</div>
+        <div class="price">¥32</div>
+      </div>
+    </div>
+    <div class="card category-guozhi" style="display:none;">
+      <img class="card-img" src="jiufengshan_xuelian_juice.png?v=1.0" alt="九峰山雪莲汁" />
+      <div class="card-info">
+        <div class="card-name">九峰山雪莲汁</div>
+        <div class="card-spec">190ml*8/箱</div>
+        <div class="price">¥58</div>
+      </div>
+    </div>
 
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.onclick=()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    render(tab.dataset.cate);
-  }
-});
+    <!-- ========== 原浆果饮 ========== -->
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="zhiyou_lanmei_yuanjiang.png?v=1.0" alt="志有蓝莓原浆" />
+      <div class="card-info">
+        <div class="card-name">志有蓝莓原浆</div>
+        <div class="card-spec">320ml/盒</div>
+        <div class="price">¥68</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="zhiyou_lanmei_yuanjiang_xia.png?v=1.0" alt="志有蓝莓原浆夏" />
+      <div class="card-info">
+        <div class="card-name">志有蓝莓原浆夏</div>
+        <div class="card-spec">750ml/盒</div>
+        <div class="price">¥25</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="zhiyou_shaiji_yuanjiang_qiu.png?v=1.0" alt="志有沙棘原浆秋" />
+      <div class="card-info">
+        <div class="card-name">志有沙棘原浆秋</div>
+        <div class="card-spec">750ml/盒</div>
+        <div class="price">¥25</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="zhiyou_bing_putao_juice_dong.png?v=1.0" alt="志有冰葡萄汁冬" />
+      <div class="card-info">
+        <div class="card-name">志有冰葡萄汁冬</div>
+        <div class="card-spec">750ml/盒</div>
+        <div class="price">¥25</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="zhenhua_youji_lanmei_yuanjiang.png?v=1.0" alt="臻有机蓝莓原浆" />
+      <div class="card-info">
+        <div class="card-name">臻有机蓝莓原浆</div>
+        <div class="card-spec">100ml*20/箱</div>
+        <div class="price">¥126</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="jiuxin_lanmei_yuanjiang.png?v=1.0" alt="九鑫蓝莓原浆" />
+      <div class="card-info">
+        <div class="card-name">九鑫蓝莓原浆</div>
+        <div class="card-spec">100ml/袋</div>
+        <div class="price">¥18</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="heyuan_lanmei_yuanjiang.png?v=1.0" alt="和原蓝莓原浆" />
+      <div class="card-info">
+        <div class="card-name">和原蓝莓原浆</div>
+        <div class="card-spec">500g/盒</div>
+        <div class="price">¥11.5</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="zhiyou_lanmei_yuanjiang_purple.png?v=1.0" alt="志有蓝莓原浆紫" />
+      <div class="card-info">
+        <div class="card-name">志有蓝莓原浆紫</div>
+        <div class="card-spec">30ml*10/盒</div>
+        <div class="price">¥18</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="senzhong_yusheng_lanmei_yuanjiang.png?v=1.0" alt="森之野生蓝莓原浆" />
+      <div class="card-info">
+        <div class="card-name">森之野生蓝莓原浆</div>
+        <div class="card-spec">30ml*10/盒</div>
+        <div class="price">¥35</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="yicun_manyuanmei_yuanjiang.png?v=1.0" alt="伊村山野蔓越莓原浆" />
+      <div class="card-info">
+        <div class="card-name">伊村山野蔓越莓原浆</div>
+        <div class="card-spec">30ml*10/盒</div>
+        <div class="price">¥20</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="yicun_lanmei_yuanjiang.png?v=1.0" alt="伊村山野蓝莓原浆" />
+      <div class="card-info">
+        <div class="card-name">伊村山野蓝莓原浆</div>
+        <div class="card-spec">30ml*10/盒</div>
+        <div class="price">¥20</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="senzhong_yusheng_lanmei_yuanjiang.png?v=1.0" alt="森之野生蓝莓原浆" />
+      <div class="card-info">
+        <div class="card-name">森之野生蓝莓原浆</div>
+        <div class="card-spec">30ml*10/盒</div>
+        <div class="price">¥38</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="lanvun_lanmei_yuanjiang.png?v=1.0" alt="蓝韵森林蓝莓原浆" />
+      <div class="card-info">
+        <div class="card-name">蓝韵森林蓝莓原浆</div>
+        <div class="card-spec">35ml*10/盒</div>
+        <div class="price">¥22</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="lanvun_shaiji_yuanjiang.png?v=1.0" alt="蓝韵森林沙棘原浆" />
+      <div class="card-info">
+        <div class="card-name">蓝韵森林沙棘原浆</div>
+        <div class="card-spec">35ml*10/盒</div>
+        <div class="price">¥22</div>
+      </div>
+    </div>
+    <div class="card category-yuanjiang" style="display:none;">
+      <img class="card-img" src="lanvun_lanmei_manyuanmei_yuanjiang.png?v=1.0" alt="蓝韵森林蔓越莓原浆" />
+      <div class="card-info">
+        <div class="card-name">蓝韵森林蔓越莓原浆</div>
+        <div class="card-spec">35ml*10/盒</div>
+        <div class="price">¥22</div>
+      </div>
+    </div>
 
-document.getElementById('closeBtn').onclick=()=>document.getElementById('imgModal').style.display='none';
-document.getElementById('imgModal').onclick=(e)=>e.target.id==='imgModal'&&(document.getElementById('imgModal').style.display='none');
+    <!-- ========== 果汁啤酒 ========== -->
+    <div class="card category-jiupi" style="display:none;">
+      <img class="card-img" src="tonghua_shuji_pijiu.png?v=1.0" alt="桦树汁啤酒" />
+      <div class="card-info">
+        <div class="card-name">桦树汁啤酒</div>
+        <div class="card-spec">500ml*6/箱</div>
+        <div class="price">¥40</div>
+      </div>
+    </div>
+    <div class="card category-jiupi" style="display:none;">
+      <img class="card-img" src="10du_baihua_shuji_pijiu.png?v=1.0" alt="10度白桦树汁啤酒" />
+      <div class="card-info">
+        <div class="card-name">10度白桦树汁啤酒</div>
+        <div class="card-spec">1L*6/箱</div>
+        <div class="price">¥92</div>
+      </div>
+    </div>
+    <div class="card category-jiupi" style="display:none;">
+      <img class="card-img" src="8du_baihua_shuji_pijiu.png?v=1.0" alt="8度白桦树汁啤酒" />
+      <div class="card-info">
+        <div class="card-name">8度白桦树汁啤酒</div>
+        <div class="card-spec">500ml*12/箱</div>
+        <div class="price">¥80</div>
+      </div>
+    </div>
 
-render(cateList[0]);
-</script>
+    <!-- ========== 果肉果酱 ========== -->
+    <div class="card category-guojiang" style="display:none;">
+      <img class="card-img" src="yicun_shanye_lanmei_guojiang.png?v=1.0" alt="伊村山野蓝莓果酱" />
+      <div class="card-info">
+        <div class="card-name">伊村山野蓝莓果酱</div>
+        <div class="card-spec">200g*6/箱</div>
+        <div class="price">¥84</div>
+      </div>
+    </div>
+    <div class="card category-guojiang" style="display:none;">
+      <img class="card-img" src="lanvun_lanmei_guojiang.png?v=1.0" alt="蓝韵森林蓝莓果酱" />
+      <div class="card-info">
+        <div class="card-name">蓝韵森林蓝莓果酱</div>
+        <div class="card-spec">180g*6/箱</div>
+        <div class="price">¥92</div>
+      </div>
+    </div>
+    <div class="card category-guojiang" style="display:none;">
+      <img class="card-img" src="lanvun_shaiji_guojiang.png?v=1.0" alt="蓝韵森林沙棘果酱" />
+      <div class="card-info">
+        <div class="card-name">蓝韵森林沙棘果酱</div>
+        <div class="card-spec">180g*6/箱</div>
+        <div class="price">¥92</div>
+      </div>
+    </div>
+    <div class="card category-guojiang" style="display:none;">
+      <img class="card-img" src="lanvun_lanmei_manyuanmei_guojiang.png?v=1.0" alt="蓝韵森林蔓越莓果酱" />
+      <div class="card-info">
+        <div class="card-name">蓝韵森林蔓越莓果酱</div>
+        <div class="card-spec">180g*6/箱</div>
+        <div class="price">¥92</div>
+      </div>
+    </div>
+    <div class="card category-guojiang" style="display:none;">
+      <img class="card-img" src="jiuxin_lanmei_guojiang.png?v=1.0" alt="九鑫蓝莓果酱" />
+      <div class="card-info">
+        <div class="card-name">九鑫蓝莓果酱</div>
+        <div class="card-spec">170g*6/箱</div>
+        <div class="price">¥74</div>
+      </div>
+    </div>
+
+    <!-- ========== 果肉罐头 ========== -->
+    <div class="card category-guantou" style="display:none;">
+      <img class="card-img" src="zhongzhi_lanmei_guantou.png?v=1.0" alt="志有蓝莓罐头" />
+      <div class="card-info">
+        <div class="card-name">志有蓝莓罐头</div>
+        <div class="card-spec">248g*6/箱</div>
+        <div class="price">¥72</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 大图预览 -->
+  <div class="img-modal" id="imgModal">
+    <img id="modalImg" src="" alt="大图预览" />
+  </div>
+
+  <script>
+    // 分类切换逻辑
+    const tabs = document.querySelectorAll('.tab');
+    const allCards = document.querySelectorAll('.card');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // 切换激活状态
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const target = tab.dataset.target;
+        // 显示/隐藏对应分类
+        allCards.forEach(card => {
+          if (card.classList.contains(`category-${target}`)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // 图片点击放大预览
+    const modal = document.getElementById('imgModal');
+    const modalImg = document.getElementById('modalImg');
+    document.querySelectorAll('.card-img').forEach(img => {
+      img.addEventListener('click', () => {
+        modalImg.src = img.src;
+        modal.style.display = 'flex';
+      });
+    });
+    modal.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+  </script>
 </body>
 </html>
